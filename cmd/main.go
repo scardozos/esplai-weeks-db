@@ -7,7 +7,7 @@ import (
 	"time"
 
 	pb "github.com/scardozos/esplai-weeks-db/api/weeksdb"
-	"github.com/scardozos/esplai-weeks-db/pkg/grpcdates"
+	"github.com/scardozos/esplai-weeks-db/cmd/grpcdates"
 	"google.golang.org/grpc"
 )
 
