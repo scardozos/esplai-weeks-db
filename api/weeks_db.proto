@@ -1,0 +1,81 @@
+syntax = "proto3";
+
+package weeksdb;
+option go_package = "github.com/scardozos/esplai-weeks-db/api/weeksdb;weeksdb";
+
+/*
+** The `Dates` service is a centralized endpoint responsible for managing and storing static weeks.
+** Static weeks are weeks in which there are either no "esplai" activities, and therefore state
+** doesn't change.
+*/
+service WeeksDatabase {
+    // `GetStaticWeeks` RPC takes an empty request (`GetStaticWeeksRequest`), and returns 
+    // a list of static weeks present in the database. (`GetStaticWeeksResponse`)
+    rpc GetStaticWeeks (GetStaticWeeksRequest) returns (GetStaticWeeksResponse);
+
+    // `IsWeekStatic` RPC takes a static week in the request parameter (`IsWeekStaticRequest`), and
+    // returns a bool depending on whether the week is present in the static week database
+    // and the requested week itself (`IsWeekStaticResponse`). 
+    rpc IsWeekStatic (IsWeekStaticRequest) returns (IsWeekStaticResponse);
+
+    // `SetStaticWeek` RPC takes a static weej in the request parameter (`SetStaticWeekRequest`), and
+    // returns the requested week as a response (`SetStaticWeekResponse`).
+    rpc SetStaticWeek (SetStaticWeekRequest) returns (SetStaticWeekResponse);
+    
+    // `UnsetStaticWeek` RPC removes a static week from the database, as changes may occur throughout
+    // the year. 
+    rpc UnsetStaticWeek (UnsetStaticWeekRequest) returns (UnsetStaticWeekResponse);
+} 
+
+// Must be a Saturday
+message Date {
+    int32 Year = 1;
+    int32 Month = 2;
+    int32 Day = 3;
+}
+
+// Must be empty
+message GetStaticWeeksRequest {} 
+
+// Returns a list with all of the weeks present in
+// the database as `Date` messages
+message GetStaticWeeksResponse {
+    repeated Date static_weeks = 1;
+}
+
+// Takes a `Date` argument, which is the week to
+// add to the static weeks database
+message SetStaticWeekRequest {
+    Date static_week = 1;
+}
+
+// Returns the week as a `Date` message added to the database, in case
+// the RPC was successful
+message SetStaticWeekResponse {
+    Date set_week = 1;
+}
+
+// Takes a `Date` argument, which is the week to
+// remove from the static weeks database
+message UnsetStaticWeekRequest {
+    Date static_week = 1;
+}
+
+// Returns the week as a `Date` removed from the database, in case
+// the RPC was successful
+message UnsetStaticWeekResponse {
+    Date unset_week = 1;
+}
+
+// Takes a `Date` argument, which is the week to
+// check whether it's present in the static weeks datbase.
+message IsWeekStaticRequest {
+    Date week = 1;
+}
+
+// Returns a `bool` stating whether the requested week is static or not,
+// and a the requested week as a `Date` message. 
+message IsWeekStaticResponse {
+    bool is_static = 1;
+    Date requested_week = 2;
+}

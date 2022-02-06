@@ -1,0 +1,3 @@
+package jsondates
+
+func main() {}
