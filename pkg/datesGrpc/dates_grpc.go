@@ -1,5 +1,0 @@
-package grpcdates
-
-func main() {
-
-}
