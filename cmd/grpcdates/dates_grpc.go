@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"log"
 	"sync"
+	"time"
 
 	weeks_pb "github.com/scardozos/esplai-weeks-db/api/weeksdb"
 	local "github.com/scardozos/esplai-weeks-db/cmd/jsondates"
@@ -23,11 +24,12 @@ type DatesServer struct {
 // `GetStaticWeeks` RPC takes an empty request (`GetStaticWeeksRequest`), and returns
 // a list of static weeks present in the database. (`GetStaticWeeksResponse`)
 func (s *DatesServer) GetStaticWeeks(ctx context.Context, req *weeks_pb.GetStaticWeeksRequest) (*weeks_pb.GetStaticWeeksResponse, error) {
+	now := time.Now()
 	s.Mu.RLock()
 	defer s.Mu.RUnlock()
 
 	// Returns all weeks found in database in proto format
-	log.Printf("Called GetStaticWeeks")
+	defer log.Printf("Called GetStaticWeeks, and took %v", time.Since(now))
 
 	return &weeks_pb.GetStaticWeeksResponse{
 		StaticWeeks: s.WeeksList.ToGrpcWeeksList(), // []*pb.Date

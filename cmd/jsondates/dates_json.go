@@ -11,6 +11,7 @@ import (
 
 var (
 	ErrorDateAlreadyPresent error = fmt.Errorf("date already present")
+	ErrorInvalidDate        error = fmt.Errorf("invalid date")
 )
 
 type WeeksJsonList struct {
@@ -67,12 +68,20 @@ func (w *WeeksJsonList) AddToList(week WeekJsonModel) error {
 		log.Printf("Could not add week to list, date '%v' already in database", week.JsonWeekToString())
 		return ErrorDateAlreadyPresent
 	}
-	// otherwise, add date to list
-	// this change is only persisted in memory
-	// to save it to the json file, it must be committed with weeksList.ToJsonFile()
-	w.Weeks = append(w.Weeks, &week)
-	log.Printf("Added week '%v' to database", week.JsonWeekToString())
-	return nil
+
+	// check if date is valid
+	// date is valid only if year is greater than 2021
+	// and if day and month >0
+	if week.Year > 2021 && week.Day > 0 && week.Month > 0 {
+
+		// if date is not present in db, add date to list
+		// this change is only persisted in memory
+		// to save it to the json file, it must be committed with weeksList.ToJsonFile()
+		w.Weeks = append(w.Weeks, &week)
+		log.Printf("Added week '%v' to database", week.JsonWeekToString())
+		return nil
+	}
+	return ErrorInvalidDate
 }
 
 func (w *WeeksJsonList) RemoveFromList(week WeekJsonModel) error {
@@ -115,6 +124,7 @@ func (w *WeeksJsonList) ToGrpcWeeksList() []*weeks_pb.Date {
 
 	// iterate through w.Weeks and append to returnSlice
 	// every week in proto format
+	// TODO: Add concurrency to this operation
 	for idx, week := range w.Weeks {
 		returnSlice[idx] = week.ToGrpcWeek()
 	}
